@@ -1,5 +1,4 @@
 name: Achievement
-main: me.ic3d.achievement.Achievement
-version: 1.3
-author: IC3D
-depend: [Spout]
+main: com.modcrafting.achievement.Achievement
+version: 1.4
+author: Deathmarine

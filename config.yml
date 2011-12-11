@@ -1,0 +1,26 @@
+#Change to MySQL for mysql support#
+#Change to SQLite for sqlite support#
+Database: SQLite
+mysql-database: 'jdbc:mysql://localhost:3306/minecraft'
+mysql-user: 'root'
+mysql-password: 'root'
+
+
+Places:
+  stone:
+    '1':
+      Message: Your first stone smelt!
+Breaks:
+  stone:
+    '1':
+      Message: Your first cobble!
+Kills:
+  zombie:
+    '1':
+      Message: Your first zombie!
+      Reward:
+        Money:
+          Amount: 1
+        Item:
+          Type: stone
+          Amount: 1

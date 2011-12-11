@@ -41,7 +41,7 @@ public class SQLDatabases {
 		}
 		if(dataHandler.equalsIgnoreCase("sqlite")){
 
-			String dbname = Config.getString("sqlite-dbname", "banlist");
+			String dbname = Config.getString("sqlite-dbname", "achievements");
 			String maindir = "plugins/Achievement/";
 			File dataFolder = new File(maindir, dbname + ".db");
 			if (!dataFolder.exists()){
@@ -97,13 +97,8 @@ public class SQLDatabases {
 		return null;
 	}	
 	public void initialize(Achievement plugin){
-		YamlConfiguration Config = (YamlConfiguration) plugin.getConfig();
-		String mysqlTable = Config.getString("mysql-table");
-		String logip = Config.getString("mysql-table-ip");
 		SQLDatabases.plugin = plugin;
 		Connection conn = getSQLConnection();
-		
-		
 		if (conn == null) {
 			log.log(Level.SEVERE, "[Achievement] Could not establish SQL connection. Disabling Achievement");
 			log.log(Level.SEVERE, "[Achievement] Adjust Settings in Config or set MySql: False");
@@ -115,12 +110,10 @@ public class SQLDatabases {
 			Statement st = null;
 			
 			try {
-				ps = conn.prepareStatement("SELECT * FROM " + mysqlTable + " WHERE (type = 0 OR type = 1 OR type = 9) AND (temptime > ? OR temptime = 0)");
-				ps.setLong(1, System.currentTimeMillis()/1000);
 				try{
 					
 					DatabaseMetaData dbm = conn.getMetaData();
-					rs = dbm.getTables(null, null, "banlist", null);
+					rs = dbm.getTables(null, null, "breaks", null);
 		            	if (!rs.next()){
 		            		conn.setAutoCommit(false);
 		            		st = conn.createStatement();
@@ -149,10 +142,9 @@ public class SQLDatabases {
 		    		   			"PRIMARY KEY (`playername`, `item`)" +
 		    		   			")");
 		            		conn.commit();
-		            		log.log(Level.INFO, "[Achievement]: Table " + mysqlTable + " created.");
-		            		log.log(Level.INFO, "[Achievement]: Table " + logip + " created.");
+		            		log.log(Level.INFO, "[Achievement]: Tables created.");
 		            	}
-		            	rs = ps.executeQuery();
+		            	//rs = ps.executeQuery();
 							            
 				} catch (SQLException ex) {
 					log.log(Level.SEVERE, "[Achievement] Database Error: No Table Found");

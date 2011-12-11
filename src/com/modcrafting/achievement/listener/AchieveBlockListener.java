@@ -24,7 +24,13 @@ public class AchieveBlockListener extends BlockListener {
 	public void onBlockBreak(BlockBreakEvent event) {
 		YamlConfiguration config = (YamlConfiguration) plugin.getConfig();
 		Player player = event.getPlayer();
-		
+		boolean auth = false;
+		if (plugin.setupPermissions()){
+			if (plugin.permission.has(player, "achievement.blockbreak")) auth = true;
+		}else{
+			if (player.isOp()) auth = true; 
+		}
+		if (!auth) return;
 		Block block = event.getBlock();
 		String blockName = block.getType().name().toLowerCase();
 		plugin.db.registerBreak(player, block);
@@ -34,10 +40,10 @@ public class AchieveBlockListener extends BlockListener {
 		if(achExists) {
 			String msg = config.getString("Breaks." + blockName + "." + breaks + ".Message");
 			if(msg.length() > 26) {
-				plugin.interfaceSpout.sendAchievement(player, "Your msg > 26 chars", block.getType());
+			plugin.interfaceSpout.sendAchievement(player, "Your msg > 26 chars", block.getType());
 				log.log(Level.INFO, "[Achievement] Your msg must be less than 26 characters!");
 			} else {
-				plugin.interfaceSpout.sendAchievement(player, msg, block.getType());
+			plugin.interfaceSpout.sendAchievement(player, msg, block.getType());
 			}
 			String reward = plugin.reward.reward(configTest);
 			if(reward.equals("none")) {
@@ -64,6 +70,13 @@ public class AchieveBlockListener extends BlockListener {
 	public void onBlockPlace(BlockPlaceEvent event) {
 		YamlConfiguration config = (YamlConfiguration) plugin.getConfig();
 		Player player = event.getPlayer();
+		boolean auth = false;
+		if (plugin.setupPermissions()){
+			if (plugin.permission.has(player, "achievement.blockplace")) auth = true;
+		}else{
+			if (player.isOp()) auth = true; 
+		}
+		if (!auth) return;
 		Block block = event.getBlock();
 		String blockName = block.getType().name().toLowerCase();
 		plugin.db.registerPlace(player, block);
@@ -73,10 +86,10 @@ public class AchieveBlockListener extends BlockListener {
 		if(achExists) {
 			String msg = config.getString("Places." + blockName + "." + places + ".Message");
 			if(msg.length() > 26) {
-				plugin.interfaceSpout.sendAchievement(player, "Your msg > 26 chars", block.getType());
+			plugin.interfaceSpout.sendAchievement(player, "Your msg > 26 chars", block.getType());
 				log.log(Level.INFO,"[Achievement] Your msg must be less than 26 characters!");
 			} else {
-				plugin.interfaceSpout.sendAchievement(player, msg, block.getType());
+			plugin.interfaceSpout.sendAchievement(player, msg, block.getType());
 			}
 		}
 		String reward = plugin.reward.reward(configTest);

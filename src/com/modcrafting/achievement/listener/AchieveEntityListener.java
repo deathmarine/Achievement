@@ -24,6 +24,14 @@ public class AchieveEntityListener extends EntityListener {
 	public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
 		YamlConfiguration config = (YamlConfiguration) plugin.getConfig();
 		Entity damager = event.getDamager();
+		Player player = (Player) damager;
+		boolean auth = false;
+		if (plugin.setupPermissions()){
+			if (plugin.permission.has(player, "achievement.entitykill")) auth = true;
+		}else{
+			if (player.isOp()) auth = true; 
+		}
+		if (!auth) return;
 		Entity entity = event.getEntity();
 		String mobName = null;
 		if(!(entity instanceof LivingEntity)) {
@@ -45,7 +53,6 @@ public class AchieveEntityListener extends EntityListener {
 			String doctored2 = doctored1.replace("org.bukkit.entity.", "");
 			mobName = doctored2;
 		}
-		Player player = (Player) damager;
 		plugin.db.registerKill(player, mobName);
 		Integer kills = plugin.db.getKills(player, mobName);
 		String configTest = "Kills." + mobName + "." + kills;
@@ -53,9 +60,9 @@ public class AchieveEntityListener extends EntityListener {
 		if(achExists) {
 			String msg = config.getString(configTest + ".Message");
 			if(msg.length() > 26) {
-				plugin.interfaceSpout.sendAchievement(player, "Msg > 26 Chars", Material.DIAMOND_SWORD);
+			plugin.interfaceSpout.sendAchievement(player, "Msg > 26 Chars", Material.DIAMOND_SWORD);
 			} else {
-				plugin.interfaceSpout.sendAchievement(player, msg, Material.DIAMOND_SWORD);
+			plugin.interfaceSpout.sendAchievement(player, msg, Material.DIAMOND_SWORD);
 			}
 			String reward = plugin.reward.reward(configTest);
 			if(reward.equals("none")) {
