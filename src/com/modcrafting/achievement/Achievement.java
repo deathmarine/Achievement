@@ -7,6 +7,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.Event.Priority;
 import org.bukkit.event.Event.Type;
 import org.bukkit.plugin.PluginDescriptionFile;
@@ -17,6 +18,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import com.modcrafting.achievement.db.SQLDatabases;
 import com.modcrafting.achievement.listener.AchieveEntityListener;
 import com.modcrafting.achievement.listener.AchieveBlockListener;
+import com.modcrafting.achievement.listener.AchieveInventoryListener;
 import com.modcrafting.achievement.spout.Interface;
 
 
@@ -29,7 +31,7 @@ public class Achievement extends JavaPlugin{
 	public Interface interfaceSpout = new Interface(this);
 	public AchieveBlockListener blockListener = new AchieveBlockListener(this);
 	public AchieveEntityListener entityListener = new AchieveEntityListener(this);
-	//public AchieveInventoryListener inventoryListener = null;
+	public AchieveInventoryListener inventoryListener = null;
 	public Rewards reward = new Rewards(this);
 	public SQLDatabases db = new SQLDatabases();
 	public HashMap<String, Integer> defBreaks = new HashMap<String, Integer>();
@@ -78,7 +80,7 @@ public class Achievement extends JavaPlugin{
 		}
 	}
 	public void onEnable() {
-		//YamlConfiguration config = (YamlConfiguration) this.getConfig();
+		YamlConfiguration config = (YamlConfiguration) this.getConfig();
 		PluginDescriptionFile pdfFile = this.getDescription();
 		new File(maindir).mkdir();
 		createDefaultConfiguration("config.yml");
@@ -97,7 +99,7 @@ public class Achievement extends JavaPlugin{
 	    pm.registerEvent(Type.BLOCK_BREAK, blockListener, Priority.Normal, this);
 		pm.registerEvent(Type.BLOCK_PLACE, blockListener, Priority.Normal, this);
 		pm.registerEvent(Type.ENTITY_DAMAGE, entityListener, Priority.Normal, this);
-		//if(setupSpout()) pm.registerEvent(Type.CUSTOM_EVENT, inventoryListener, Priority.Normal, this);
+		if(setupSpout()) pm.registerEvent(Type.CUSTOM_EVENT, inventoryListener, Priority.Normal, this);
 		log.log(Level.INFO,"[" + pdfFile.getName() + "]" + " version " + pdfFile.getVersion() + " is enabled!" );
 		
 		
@@ -117,12 +119,12 @@ public class Achievement extends JavaPlugin{
 			}
 				return (economy != null);
 		}	
-	/*public boolean setupSpout(){
+	public boolean setupSpout(){
 		RegisteredServiceProvider<org.getspout.spoutapi.player.SpoutPlayer> spoutProvider = getServer().getServicesManager().getRegistration(org.getspout.spoutapi.player.SpoutPlayer.class);
 			if (spoutProvider != null) {
 				spout = spoutProvider.getProvider();
 				inventoryListener = new AchieveInventoryListener(this);
 			}
 				return (spout != null);
-		}*/
+		}
 }	

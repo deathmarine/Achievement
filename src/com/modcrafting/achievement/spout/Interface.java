@@ -3,6 +3,8 @@ package com.modcrafting.achievement.spout;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.getspout.spoutapi.player.SpoutPlayer;
+
 import com.modcrafting.achievement.Achievement;
 
 public class Interface {
@@ -12,14 +14,15 @@ public class Interface {
 	}
 
 	public void sendAchievement(Player player, String msg, Material mat) {
-		//if (plugin.setupSpout()){
-	//			plugin.spout = (org.getspout.spoutapi.player.SpoutPlayer) player;
-	//			plugin.spout.sendNotification("Achievement Get!", msg, mat);
-	//		} else {
+			if (plugin.setupSpout()){
+				plugin.spout = (SpoutPlayer) player;
+				plugin.spout.sendNotification("Achievement Get!", msg, mat);
+			} else {
 				player.sendMessage(ChatColor.YELLOW + "Achievement Get!");
 				player.sendMessage(ChatColor.WHITE + msg);
 			}
 		}
+}
 	
 
 
