@@ -7,7 +7,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.Event.Priority;
 import org.bukkit.event.Event.Type;
 import org.bukkit.plugin.PluginDescriptionFile;
@@ -80,7 +79,6 @@ public class Achievement extends JavaPlugin{
 		}
 	}
 	public void onEnable() {
-		YamlConfiguration config = (YamlConfiguration) this.getConfig();
 		PluginDescriptionFile pdfFile = this.getDescription();
 		new File(maindir).mkdir();
 		createDefaultConfiguration("config.yml");
