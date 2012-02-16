@@ -6,21 +6,23 @@ import java.util.logging.Logger;
 import org.bukkit.block.Block;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.block.BlockListener;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
 import com.modcrafting.achievement.Achievement;
 
-public class AchieveBlockListener extends BlockListener {
+public class AchieveBlockListener implements Listener {
 	public final static Logger log = Logger.getLogger("Minecraft");
 	Achievement plugin;
 
 	public AchieveBlockListener(Achievement instance) {
 		plugin = instance;
 	}
+	@EventHandler
 	public void onBlockBreak(BlockBreakEvent event) {
 		YamlConfiguration config = (YamlConfiguration) plugin.getConfig();
 		Player player = event.getPlayer();

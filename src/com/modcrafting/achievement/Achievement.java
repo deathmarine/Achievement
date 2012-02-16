@@ -94,10 +94,10 @@ public class Achievement extends JavaPlugin{
 	    db.initialize(this);
 	    //Register events:
 		PluginManager pm = getServer().getPluginManager();
-	    pm.registerEvent(Type.BLOCK_BREAK, blockListener, Priority.Normal, this);
-		pm.registerEvent(Type.BLOCK_PLACE, blockListener, Priority.Normal, this);
-		pm.registerEvent(Type.ENTITY_DAMAGE, entityListener, Priority.Normal, this);
-		if(setupSpout()) pm.registerEvent(Type.CUSTOM_EVENT, inventoryListener, Priority.Normal, this);
+	    pm.registerEvents(blockListener, this);
+		pm.registerEvents(blockListener, this);
+		pm.registerEvents(entityListener, this);
+		if(setupSpout()) pm.registerEvents(inventoryListener, this);
 		log.log(Level.INFO,"[" + pdfFile.getName() + "]" + " version " + pdfFile.getVersion() + " is enabled!" );
 		
 		

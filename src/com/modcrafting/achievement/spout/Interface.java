@@ -18,11 +18,15 @@ public class Interface {
 				plugin.spout = (SpoutPlayer) player;
 				plugin.spout.sendNotification("Achievement Get!", msg, mat);
 			} else {
-				player.sendMessage(ChatColor.YELLOW + "Achievement Get!");
-				player.sendMessage(ChatColor.WHITE + msg);
+				if(player instanceof SpoutPlayer && ((SpoutPlayer) player).isSpoutCraftEnabled()){
+					plugin.spout = (SpoutPlayer) player;
+					plugin.spout.sendNotification("Achievement Get!", msg, mat);
+				}else{
+					player.sendMessage(ChatColor.YELLOW + "Achievement Get!");
+					player.sendMessage(ChatColor.WHITE + msg);
+				}
 			}
 		}
 }
 	
-
 

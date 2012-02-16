@@ -5,25 +5,31 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.entity.EntityListener;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
 import com.modcrafting.achievement.Achievement;
 
-public class AchieveEntityListener extends EntityListener {
+public class AchieveEntityListener implements Listener {
 	
 	private Achievement plugin;
 	
 	public AchieveEntityListener(Achievement plugin) {
         this.plugin = plugin;
     }
-	
+
+	@EventHandler
 	public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
 		YamlConfiguration config = (YamlConfiguration) plugin.getConfig();
 		Entity damager = event.getDamager();
+		if(!(damager instanceof Player))
+		{
+			return;
+		}
 		Player player = (Player) damager;
 		boolean auth = false;
 		if (plugin.setupPermissions()){
@@ -86,7 +92,8 @@ public class AchieveEntityListener extends EntityListener {
 			}
 		}
 	}
-	
+
+	@EventHandler
 	public void onEntityDamage(EntityDamageEvent event) {
 		if(event instanceof EntityDamageByEntityEvent) {
 			this.onEntityDamageByEntity((EntityDamageByEntityEvent) event);

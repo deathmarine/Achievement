@@ -2,8 +2,8 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
-	<classpathentry kind="lib" path="D:/Documents/Downloads/Java Jar/craftbukkit-1.0.0-SNAPSHOT.jar"/>
 	<classpathentry kind="lib" path="D:/Documents/Downloads/Java Jar/Vault.jar"/>
 	<classpathentry kind="lib" path="D:/Documents/Downloads/Java Jar/SpoutAPI(2).jar"/>
+	<classpathentry kind="lib" path="D:/Documents/Downloads/craftbukkit-1.1-R1-20120121.235721-81.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

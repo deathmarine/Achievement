@@ -3,21 +3,21 @@ package com.modcrafting.achievement.listener;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.getspout.spoutapi.event.inventory.InventoryCraftEvent;
-import org.getspout.spoutapi.event.inventory.InventoryListener;
-
 import com.modcrafting.achievement.Achievement;
 
-public class AchieveInventoryListener extends InventoryListener {
+public class AchieveInventoryListener implements Listener {
 	
 	private Achievement plugin;
 	
 	public AchieveInventoryListener(Achievement plugin) {
         this.plugin = plugin;
     }
-	
+	@EventHandler
 	public void onInventoryCraft(InventoryCraftEvent event) {
 		YamlConfiguration config = (YamlConfiguration) plugin.getConfig();
 		try {
