@@ -10,6 +10,7 @@ import org.bukkit.inventory.PlayerInventory;
 import org.getspout.spoutapi.event.inventory.InventoryCraftEvent;
 import com.modcrafting.achievement.Achievement;
 
+@SuppressWarnings("deprecation")
 public class AchieveInventoryListener implements Listener {
 	
 	private Achievement plugin;

@@ -4,18 +4,16 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 
-public abstract class AchievementGetEvent extends Event implements Cancellable {
-	
-	private static final long serialVersionUID = -83839173849184L;
+public abstract class AchievementGetEvent extends Event implements Cancellable{
 	
 	protected Player player;
 	protected boolean cancelled;
 	protected String type;
 	protected AchievementGetEvent(String name) {
-		super(name);
+		super();
 	}
 	public AchievementGetEvent(String event, Player player, String type) {
-		super(event);
+		super();
 		this.player = player;
 		this.type = type;
 	}

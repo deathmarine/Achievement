@@ -69,6 +69,7 @@ public class AchieveBlockListener implements Listener {
 			}
 		}
 	}
+	@EventHandler
 	public void onBlockPlace(BlockPlaceEvent event) {
 		YamlConfiguration config = (YamlConfiguration) plugin.getConfig();
 		Player player = event.getPlayer();
