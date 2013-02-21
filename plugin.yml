@@ -1,4 +1,22 @@
 name: Achievement
 main: com.modcrafting.achievement.Achievement
-version: 1.6
-author: Deathmarine
+website: http://dev.bukkit.org/server-mods/achievement/
+version: 1.7
+authors: [Deathmarine,captainawesome7]
+depend: [Vault]
+description: >
+             Achievement Plugin for Bukkit.
+permissions:
+  achievement.*:
+    default: op
+    description: Allows All Achievements.
+    children:
+      achievement.blockbreak: true
+      achievement.blockplace: true
+      achievement.entitykill: true
+  achievement.blockbreak:
+    description: Allows Block Breaking Achievements.
+  achievement.blockplace:
+    description: Allows Block Place Achievements.
+  achievement.entitykill:
+    description: Allows Killing Achievements.

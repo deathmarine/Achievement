@@ -1,29 +1,33 @@
 package com.modcrafting.achievement.listener;
 
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event.Result;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.CraftItemEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
-import org.getspout.spoutapi.event.inventory.InventoryCraftEvent;
 import com.modcrafting.achievement.Achievement;
 
-@SuppressWarnings("deprecation")
 public class AchieveInventoryListener implements Listener {
-	
 	private Achievement plugin;
 	
 	public AchieveInventoryListener(Achievement plugin) {
         this.plugin = plugin;
     }
-	@EventHandler
-	public void onInventoryCraft(InventoryCraftEvent event) {
+
+	@EventHandler(priority = EventPriority.MONITOR)
+	public void onInventoryCraft(CraftItemEvent event) {
 		YamlConfiguration config = (YamlConfiguration) plugin.getConfig();
+		if(!(event.getWhoClicked() instanceof Player) || !event.getResult().equals(Result.ALLOW))
+			return;
 		try {
-			Player player = event.getPlayer();
-			ItemStack item = event.getResult();
+			Player player = (Player) event.getWhoClicked();
+			ItemStack item = event.getRecipe().getResult();
 			String name = item.getType().name().toLowerCase();
 			plugin.db.registerCraft(player, item);
 			Integer times = plugin.db.getCrafts(player, item);
@@ -31,6 +35,7 @@ public class AchieveInventoryListener implements Listener {
 			Boolean achExists = plugin.reward.checkAchievement(configTest);
 			if(achExists) {
 				String msg = config.getString(configTest + ".Message");
+				msg=ChatColor.translateAlternateColorCodes('&', msg);
 				if(msg.length() > 26) {
 					plugin.interfaceSpout.sendAchievement(player, "Msg > 26 Chars", Material.WORKBENCH);
 				} else {

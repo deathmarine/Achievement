@@ -5,50 +5,39 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import org.bukkit.block.Block;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import com.modcrafting.achievement.Achievement;
 
 public class SQLDatabases {
-	public final static Logger log = Logger.getLogger("Minecraft");
 	static Achievement plugin;
 	
 	public Connection getSQLConnection() {
-		YamlConfiguration Config = (YamlConfiguration) plugin.getConfig();
-		String dataHandler = Config.getString("Database");
-		String mysqlDatabase = Config.getString("mysql-database","jdbc:mysql://localhost:3306/minecraft");
-		String mysqlUser = Config.getString("mysql-user","root");
-		String mysqlPassword = Config.getString("mysql-password","root");
+		String dataHandler = plugin.getConfig().getString("Database");
+		String mysqlDatabase = plugin.getConfig().getString("MYSQL.Database","jdbc:mysql://localhost:3306/minecraft");
+		String mysqlUser = plugin.getConfig().getString("MYSQL.User","root");
+		String mysqlPassword = plugin.getConfig().getString("MYSQL.Password","root");
 		if(dataHandler.equalsIgnoreCase("mysql")){
 			try {
-
 				return DriverManager.getConnection(mysqlDatabase + "?autoReconnect=true&user=" + mysqlUser + "&password=" + mysqlPassword);
 			} catch (SQLException ex) {
-			
-				log.log(Level.SEVERE, "Unable to retreive connection", ex);
+				plugin.getLogger().severe("Unable to retreive connection" + ex);
 			}
 			return null;
 		}
 		if(dataHandler.equalsIgnoreCase("sqlite")){
-
-			String dbname = Config.getString("sqlite-dbname", "achievements");
-			String maindir = "plugins/Achievement/";
-			File dataFolder = new File(maindir, dbname + ".db");
-			if (!dataFolder.exists()){
+			String dbname = plugin.getConfig().getString("sqlite-dbname", "achievements");
+			File dbfile = new File(plugin.getDataFolder(), dbname + ".db");
+			if (!dbfile.exists()){
 				try {
-					dataFolder.createNewFile();
+					dbfile.createNewFile();
 					Class.forName("org.sqlite.JDBC");
-		            Connection conn = DriverManager.getConnection("jdbc:sqlite:" + dataFolder);
+		            Connection conn = DriverManager.getConnection("jdbc:sqlite:" + dbfile);
 		            Statement st = conn.createStatement();
 		            st.execute("CREATE TABLE IF NOT EXISTS `breaks` (" +
 		    			"playername varchar(32)," +
@@ -76,22 +65,22 @@ public class SQLDatabases {
 		   				")");
 	        		return conn;
 				} catch (IOException ex) {
-					log.log(Level.SEVERE, "File write error: " + dbname);
+					plugin.getLogger().severe( "File write error: " + dbname);
 				} catch (SQLException ex) {
-			            log.log(Level.SEVERE,"SQLite exception on initialize", ex);
+					plugin.getLogger().severe("SQLite exception on initialize"+ ex);
 			    } catch (ClassNotFoundException ex) {
-			        	log.log(Level.SEVERE, "You need the SQLite JBDC library. Google it. Put it in /lib folder.");
+			    	plugin.getLogger().severe("You need the SQLite JBDC library. Google it. Put it in /lib folder.");
 			    }
 			}
 			try {
 	            Class.forName("org.sqlite.JDBC");
-	            Connection conn = DriverManager.getConnection("jdbc:sqlite:" + dataFolder);
+	            Connection conn = DriverManager.getConnection("jdbc:sqlite:" + dbfile);
 	            return conn;
         		
 	        } catch (SQLException ex) {
-	            log.log(Level.SEVERE,"SQLite exception on initialize", ex);
+	            plugin.getLogger().severe("SQLite exception on initialize"+ ex);
 	        } catch (ClassNotFoundException ex) {
-	        	log.log(Level.SEVERE, "You need the SQLite library.", ex);
+	        	plugin.getLogger().severe("You need the SQLite library." + ex);
 	        }
 	    }
 		return null;
@@ -100,98 +89,55 @@ public class SQLDatabases {
 		SQLDatabases.plugin = plugin;
 		Connection conn = getSQLConnection();
 		if (conn == null) {
-			log.log(Level.SEVERE, "[Achievement] Could not establish SQL connection. Disabling Achievement");
-			log.log(Level.SEVERE, "[Achievement] Adjust Settings in Config or set MySql: False");
+			plugin.getLogger().severe( "[Achievement] Could not establish SQL connection. Disabling Achievement");
+			plugin.getLogger().severe( "[Achievement] Adjust Settings in Config or set MySql: False");
 			plugin.getServer().getPluginManager().disablePlugin(plugin);
 			return;
 		} else {
-			PreparedStatement ps = null;
-			ResultSet rs = null;
-			Statement st = null;
-			
 			try {
-				try{
-					
-					DatabaseMetaData dbm = conn.getMetaData();
-					rs = dbm.getTables(null, null, "breaks", null);
-		            	if (!rs.next()){
-		            		conn.setAutoCommit(false);
-		            		st = conn.createStatement();
-		            		st.execute("CREATE TABLE IF NOT EXISTS `breaks` (" +
-		    	    			"playername varchar(32)," +
-		    	    			"blockid SMALLINT UNSIGNED," +
-		    		    		"breaks INT UNSIGNED," +
-		    		    		"PRIMARY KEY(`playername`, `blockid`)" +
-		    		    		")");
-		    		    	st.execute("CREATE TABLE IF NOT EXISTS `places` (" +
-		    		    		"playername varchar(32)," +
-		    		    		"blockid SMALLINT UNSIGNED," +
-		    		    		"places INT UNSIGNED," +
-		    		    		"PRIMARY KEY(`playername`, `blockid`)" +
-		    		    		")");
-		    		    	st.execute("CREATE TABLE IF NOT EXISTS `kills` (" +
-		    		    		"playername varchar(32)," +
-		    		    		"mobname varchar(32)," + 
-		    		    		"kills INT UNSIGNED," +
-		    		    		"PRIMARY KEY (`playername`, `mobname`)" +
-		    		    		")");
-		    		    	st.execute("CREATE TABLE IF NOT EXISTS `crafts` (" +
-		    		   			"playername varchar(32)," +
-		    		   			"item SMALLINT UNSIGNED," + 
-		    		   			"times INT UNSIGNED," +
-		    		   			"PRIMARY KEY (`playername`, `item`)" +
-		    		   			")");
-		            		conn.commit();
-		            		log.log(Level.INFO, "[Achievement]: Tables created.");
-		            	}
-		            	//rs = ps.executeQuery();
-							            
-				} catch (SQLException ex) {
-					log.log(Level.SEVERE, "[Achievement] Database Error: No Table Found");
-                }
-				
-				try {
-					while (rs.next()){
-					//String pName = rs.getString("name").toLowerCase();
-					}
-				}catch (NullPointerException ex){
-					log.log(Level.SEVERE, "[Achievement] Detected Major issues with database.");
-					plugin.getServer().getPluginManager().disablePlugin(plugin);
-					log.log(Level.SEVERE, "[Achievement] Attempting Restart.");
-					plugin.getServer().getPluginManager().enablePlugin(plugin);
-					return;
-				}
-			} catch (SQLException ex) {
-				log.log(Level.SEVERE, "[Achievement] Couldn't execute MySQL statement: ", ex);
-				return;
-			} finally {
-				try {
-					if (ps != null)
-						ps.close();
+				DatabaseMetaData dbm = conn.getMetaData();
+				ResultSet rs = dbm.getTables(null, null, "breaks", null);
+            	if (!rs.next()){
+            		conn.setAutoCommit(false);
+            		Statement st = conn.createStatement();
+            		st.execute("CREATE TABLE IF NOT EXISTS `breaks` (" +
+    	    			"playername varchar(32)," +
+    	    			"blockid SMALLINT UNSIGNED," +
+    		    		"breaks INT UNSIGNED," +
+    		    		"PRIMARY KEY(`playername`, `blockid`)" +
+    		    		")");
+    		    	st.execute("CREATE TABLE IF NOT EXISTS `places` (" +
+    		    		"playername varchar(32)," +
+    		    		"blockid SMALLINT UNSIGNED," +
+    		    		"places INT UNSIGNED," +
+    		    		"PRIMARY KEY(`playername`, `blockid`)" +
+    		    		")");
+    		    	st.execute("CREATE TABLE IF NOT EXISTS `kills` (" +
+    		    		"playername varchar(32)," +
+    		    		"mobname varchar(32)," + 
+    		    		"kills INT UNSIGNED," +
+    		    		"PRIMARY KEY (`playername`, `mobname`)" +
+    		    		")");
+    		    	st.execute("CREATE TABLE IF NOT EXISTS `crafts` (" +
+    		   			"playername varchar(32)," +
+    		   			"item SMALLINT UNSIGNED," + 
+    		   			"times INT UNSIGNED," +
+    		   			"PRIMARY KEY (`playername`, `item`)" +
+    		   			")");
+            		conn.commit();
 					if (rs != null)
 						rs.close();
 					if (conn != null)
 						conn.close();
-				} catch (SQLException ex) {
-					log.log(Level.SEVERE, "[Achievement] Failed to close MySQL connection: ", ex);
-				}
-			}	
-
-			try {
-				if (!plugin.isEnabled()){
-					return;
-				}
-				conn.close();
-				log.log(Level.INFO, "[Achievement] Initialized db connection" );
-			} catch (SQLException e) {
-				e.printStackTrace();
-				plugin.getServer().getPluginManager().disablePlugin(plugin);
+            		plugin.getLogger().severe("Tables created.");
+            	}
+			} catch (SQLException ex) {
+				plugin.getLogger().severe("Couldn't execute MySQL statement: "+ ex);
 			}
 		}
 		
 	}
 	public Integer getCrafts(Player player, ItemStack item) {
-		
 		try {
 			Connection conn = getSQLConnection();
 			Statement st = conn.createStatement();
@@ -264,8 +210,7 @@ public class SQLDatabases {
 			Integer newBreaks = blockBreaks + 1;
 			st.execute("replace into `places` (playername, blockid, places) VALUES ('" + player.getName() + "'," + block.getTypeId() + ", " + newBreaks + ")");
 		} catch(SQLException e) {
-				e.printStackTrace();
-				return;
+			e.printStackTrace();
 		}
 	}
 	public Integer getBlockPlaces(Player player, Block block) {
@@ -311,7 +256,6 @@ public class SQLDatabases {
 		st.execute("replace into `breaks` (playername, blockid, breaks) VALUES ('" + player.getName() + "'," + block.getTypeId() + ", " + newBreaks + ")");
 		} catch(SQLException e) {
 			e.printStackTrace();
-			return;
 		}
 	}
 }

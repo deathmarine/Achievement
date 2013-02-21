@@ -1,57 +1,41 @@
 package com.modcrafting.achievement.listener;
 
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
 import com.modcrafting.achievement.Achievement;
 
 public class AchieveEntityListener implements Listener {
-	
 	private Achievement plugin;
 	
 	public AchieveEntityListener(Achievement plugin) {
         this.plugin = plugin;
     }
 
-	@EventHandler
+	@EventHandler(priority = EventPriority.MONITOR)
 	public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
-		YamlConfiguration config = (YamlConfiguration) plugin.getConfig();
-		Entity damager = event.getDamager();
-		if(!(damager instanceof Player))
-		{
+		if(!(event.getDamager() instanceof Player))
 			return;
-		}
-		Player player = (Player) damager;
-		boolean auth = false;
-		if (plugin.setupPermissions()){
-			if (plugin.permission.has(player, "achievement.entitykill")) auth = true;
-		}else{
-			if (player.isOp()) auth = true; 
-		}
-		if (!auth) return;
+		Player player = (Player) event.getDamager();
+		if (!player.hasPermission("achievement.entitykill"))
+			return;
 		Entity entity = event.getEntity();
 		String mobName = null;
 		if(!(entity instanceof LivingEntity)) {
 			return;
 		}
-		if(entity instanceof LivingEntity) {
-			LivingEntity alive = (LivingEntity) entity;
-			if(!(event.getDamage() >= alive.getHealth())) {
-				return;
-			}
-		}
-		if(!(damager instanceof Player)) {
+		if(entity instanceof LivingEntity && !(event.getDamage() >= ((LivingEntity) entity).getHealth()))
 			return;
-		}
+		
 		if(entity instanceof Player) {
 			mobName = "player";
 		} else {
@@ -64,18 +48,19 @@ public class AchieveEntityListener implements Listener {
 		String configTest = "Kills." + mobName + "." + kills;
 		Boolean achExists = plugin.reward.checkAchievement(configTest);
 		if(achExists) {
-			String msg = config.getString(configTest + ".Message");
+			String msg = plugin.getConfig().getString(configTest + ".Message");
+			msg=ChatColor.translateAlternateColorCodes('&', msg);
 			if(msg.length() > 26) {
-			plugin.interfaceSpout.sendAchievement(player, "Msg > 26 Chars", Material.DIAMOND_SWORD);
+				plugin.interfaceSpout.sendAchievement(player, "Msg > 26 Chars", Material.DIAMOND_SWORD);
 			} else {
-			plugin.interfaceSpout.sendAchievement(player, msg, Material.DIAMOND_SWORD);
+				plugin.interfaceSpout.sendAchievement(player, msg, Material.DIAMOND_SWORD);
 			}
 			String reward = plugin.reward.reward(configTest);
 			if(reward.equals("none")) {
 				return;
 			}
 			if(reward.equals("money")) {
-				Integer amount = config.getInt(configTest + ".Reward.Money.Amount", 0);
+				Integer amount = plugin.getConfig().getInt(configTest + ".Reward.Money.Amount", 0);
 				plugin.reward.rewardMoney(player, amount);
 			}
 			if(reward.equals("item")) {
@@ -87,17 +72,9 @@ public class AchieveEntityListener implements Listener {
 				ItemStack item = plugin.reward.getItemReward(player, configTest);
 				PlayerInventory inv = player.getInventory();
 				inv.addItem(item);
-				Integer amount = config.getInt(configTest + ".Reward.Money.Amount", 0);
+				Integer amount = plugin.getConfig().getInt(configTest + ".Reward.Money.Amount", 0);
 				plugin.reward.rewardMoney(player, amount);
 			}
-		}
-	}
-
-	@EventHandler
-	public void onEntityDamage(EntityDamageEvent event) {
-		if(event instanceof EntityDamageByEntityEvent) {
-			this.onEntityDamageByEntity((EntityDamageByEntityEvent) event);
-			return;
 		}
 	}
 }
